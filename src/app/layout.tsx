@@ -1,17 +1,18 @@
-'use client'; 
+'use client';
 
-import { ThemeProvider, CssBaseline } from '@mui/material'; 
-import theme from '../theme'; 
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import theme from '../theme';
+import { AuthProvider } from './context/AuthContext'; // <- adicione isso
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <html>
-        <body>
-          {children}
-        </body>
-      </html>
+      <AuthProvider> 
+        <html>
+          <body>{children}</body>
+        </html>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

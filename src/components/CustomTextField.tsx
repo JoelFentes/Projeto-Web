@@ -7,6 +7,7 @@ interface CustomTextFieldProps {
   id: string;
   label: string;
   type?: string;
+  autoComplete?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
@@ -19,6 +20,8 @@ export default function CustomTextField({
   type = 'text',
   required = false,
   fullWidth = true,
+  value,
+  onChange,
 }: CustomTextFieldProps) {
   const theme = useTheme();
 
@@ -39,12 +42,15 @@ export default function CustomTextField({
       <Input
         id={id}
         type={type}
+        value={value}         // <== ADICIONE ISSO
+        onChange={onChange}   // <== E ISSO
         sx={{
           fontFamily: 'Roboto, sans-serif',
-          fontWeight: 300, // Roboto Light
+          fontWeight: 300,
           color: theme.palette.text.primary,
         }}
       />
     </FormControl>
   );
 }
+

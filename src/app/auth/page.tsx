@@ -8,18 +8,47 @@ import {
   Link,
 } from '@mui/material';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext'; // <-- IMPORTANTE
 
 export default function AuthPage() {
+  const router = useRouter();
+  const { setUser } = useAuth(); // <-- PEGANDO O SETUSER DO CONTEXTO
+
   const [isSignup, setIsSignup] = useState(false);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Lógica de login ou cadastro
-    console.log(isSignup ? 'Cadastrando:' : 'Logando:', email, password);
+    const endpoint = isSignup ? '/api/auth/signup' : '/api/auth/login';
+
+    const body = isSignup
+      ? { name, email, password }
+      : { email, password };
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || 'Erro');
+      return;
+    }
+
+    // Salva token e usuário
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    setUser(data.user);
+
+    router.push('/');
   };
 
   return (
@@ -57,10 +86,24 @@ export default function AuthPage() {
           {isSignup ? 'Preencha os dados para se cadastrar.' : 'Faça login para continuar.'}
         </Typography>
 
+        {isSignup && (
+          <CustomTextField
+            id="name"
+            label="Nome"
+            type="text"
+            autoComplete="name"
+            required
+            fullWidth
+            value={name}
+            onChange={(e: any) => setName(e.target.value)}
+          />
+        )}
+
         <CustomTextField
           id="email"
           label="Email"
           type="email"
+          autoComplete="email"
           required
           fullWidth
           value={email}
@@ -70,6 +113,7 @@ export default function AuthPage() {
           id="password"
           label="Senha"
           type="password"
+          autoComplete="current-password"
           required
           fullWidth
           value={password}

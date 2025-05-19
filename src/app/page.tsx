@@ -1,50 +1,57 @@
-import { Box, Typography, Button, Divider } from '@mui/material';
+'use client';
+
+
+import { Box, Typography, Button, Divider, IconButton } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import Image from 'next/image';
 import DevSVG from '@/assets/websiteHome.svg';
+import { useAuth } from './context/AuthContext'; 
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
 
 export default function HomePage() {
+  const { user } = useAuth(); 
+
   return (
+    <Box
+    sx={{
+      width: '100%',
+      minHeight: '100vh',
+      bgcolor: 'background.default',
+      overflowX: 'hidden',
+    }}
+  >
+    <Navbar />
+
     <Box
       sx={{
         width: '100%',
-        minHeight: '100vh',
-        bgcolor: 'background.default',
-        overflowX: 'hidden', // Garante que não haverá scroll horizontal
+        maxWidth: '100vw',
+        margin: '0 auto',
+        overflow: 'hidden',
       }}
     >
-      <Navbar />
-
-      {/* Container principal que limita o conteúdo */}
       <Box
         sx={{
-          width: '100%',
-          maxWidth: '100vw',
-          margin: '0 auto',
-          overflow: 'hidden',
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          px: 4,
+          boxSizing: 'border-box',
         }}
       >
-        {/* Primeira seção */}
-        <Box
-          sx={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' }, // Responsivo: coluna em mobile, linha em desktop
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            px: 4,
-            boxSizing: 'border-box', 
-          }}
-        >
-          <Box id="home" sx={{ gap: 2, display: 'flex', flexDirection: 'column', pb: 8, maxWidth: '600px' }}>
-            <Typography variant="h2" fontWeight="bold" color="text.primary">
-              Bem-vindo ao <br />DevPortfolio!
-            </Typography>
-            <Typography variant="body2" color="text.primary">
-              Um mundo para compartilhar seus projetos, habilidades e experiências.
-            </Typography>
+        <Box id="home" sx={{ gap: 2, display: 'flex', flexDirection: 'column', pb: 8, maxWidth: '600px' }}>
+          <Typography variant="h2" fontWeight="bold" color="text.primary">
+            Bem-vindo ao <br />DevPortfolio!
+          </Typography>
+          <Typography variant="body2" color="text.primary">
+            Um mundo para compartilhar seus projetos, habilidades e experiências.
+          </Typography>
 
+          {!user ? (
             <Link href="/auth" passHref>
               <Button
                 variant="contained"
@@ -60,20 +67,24 @@ export default function HomePage() {
                 Começar
               </Button>
             </Link>
-          </Box>
-
-          <Box sx={{ width: { xs: '100%', md: '35%' }, maxWidth: '500px', mt: { xs: 4, md: 0 } }}>
-            <Image 
-              src={DevSVG} 
-              alt="Developer Illustration" 
-              style={{ width: '100%', height: 'auto' }} 
-              priority
-            />
-          </Box>
+          ) : (
+            <Typography variant="body2" color="text.primary">
+              
+            </Typography>
+          )}
         </Box>
 
-        {/* Divider */}
-        <Divider sx={{ width: '80%', mx: 'auto', bgcolor: '#202020' }} />
+        <Box sx={{ width: { xs: '100%', md: '35%' }, maxWidth: '500px', mt: { xs: 4, md: 0 } }}>
+          <Image
+            src={DevSVG}
+            alt="Developer Illustration"
+            style={{ width: '100%', height: 'auto' }}
+            priority
+          />
+        </Box>
+      </Box>
+
+      <Divider sx={{ width: '80%', mx: 'auto', bgcolor: '#202020' }} />
 
         {/* Segunda seção: Sobre */}
         <Box
