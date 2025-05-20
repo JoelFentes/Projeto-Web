@@ -35,11 +35,11 @@ export default function Navbar() {
           <Image src={Logo} alt="Logo" style={{ width: '100%', height: '100%' }} />
         </Box>
         <Box sx={{ display: 'flex', gap: 5, mr: 10, alignItems: 'center' }}>
-          <Button sx={{ color: "text.secondary" }} onClick={() => router.push('/')}>Home</Button>
+          <Button sx={{ color: "text.secondary" }} component="a" href="/">Home</Button>
           <Divider orientation="vertical" flexItem sx={{ bgcolor: 'text.secondary' }} />
-          <Button sx={{ color: "text.secondary" }} onClick={() => router.push('/')}>Sobre</Button>
+          <Button sx={{ color: "text.secondary" }} component="a" href="/#sobre">Sobre</Button>
           <Divider orientation="vertical" flexItem sx={{ bgcolor: 'text.secondary' }} />
-          <Button sx={{ color: "text.secondary" }} onClick={() => router.push('/')}>Devs</Button>
+          <Button sx={{ color: "text.secondary" }} component="a" href="/#devs">Devs</Button>
           <Divider orientation="vertical" flexItem sx={{ bgcolor: 'text.secondary' }} />
 
           {!user ? (

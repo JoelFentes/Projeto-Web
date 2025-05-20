@@ -9,11 +9,11 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/app/context/AuthContext'; // <-- IMPORTANTE
+import { useAuth } from '@/app/context/AuthContext'; 
 
 export default function AuthPage() {
   const router = useRouter();
-  const { setUser } = useAuth(); // <-- PEGANDO O SETUSER DO CONTEXTO
+  const { setUser } = useAuth();
 
   const [isSignup, setIsSignup] = useState(false);
   const [name, setName] = useState('');
