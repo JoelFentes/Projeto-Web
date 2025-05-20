@@ -7,6 +7,8 @@ interface CustomTextFieldProps {
   id: string;
   label: string;
   type?: string;
+  placeholder?: string;
+  variant?: 'standard' | 'filled' | 'outlined';
   autoComplete?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -18,6 +20,8 @@ export default function CustomTextField({
   id,
   label,
   type = 'text',
+  variant = 'standard',
+  placeholder,
   required = false,
   fullWidth = true,
   value,
@@ -27,7 +31,7 @@ export default function CustomTextField({
 
   return (
     <FormControl
-      variant="standard"
+      variant={variant}
       fullWidth={fullWidth}
       required={required}
       sx={{ my: 2 }}
@@ -42,8 +46,9 @@ export default function CustomTextField({
       <Input
         id={id}
         type={type}
-        value={value}         // <== ADICIONE ISSO
-        onChange={onChange}   // <== E ISSO
+        placeholder={placeholder}
+        value={value}         
+        onChange={onChange}   
         sx={{
           fontFamily: 'Roboto, sans-serif',
           fontWeight: 300,

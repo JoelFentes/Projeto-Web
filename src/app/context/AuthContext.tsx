@@ -1,9 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+// src/context/AuthContext.tsx
+'use client';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
   name: string;
   email: string;
-  // outros campos que você queira
 }
 
 interface AuthContextType {
@@ -18,19 +20,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Pega o token e user do localStorage para manter sessão ao recarregar
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    // Puxa os dados do usuário na montagem
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      } catch (e) {
+        setUser(null);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
     setUser(null);
+    fetch('/api/auth/logout', { method: 'POST' });
   }
 
   return (

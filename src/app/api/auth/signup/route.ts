@@ -1,3 +1,4 @@
+// src/app/api/auth/signup/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { hashPassword } from '@/lib/hash';
@@ -25,14 +26,21 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const token = generateToken({ userId: user.id });
+  const token = generateToken({ email: user.email });
 
-  return NextResponse.json({
-    token,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    },
+  const response = NextResponse.json({
+    user: { id: user.id, email: user.email, name: user.name },
   });
+
+  response.cookies.set({
+    name: 'token',
+    value: token,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 7,
+  });
+
+  return response;
 }

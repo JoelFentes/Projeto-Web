@@ -1,6 +1,6 @@
 'use client';
 
-import CustomTextField from '@/components/CustomTextField';
+import CustomTextField from '@/components/CustomTextFieldAuth';
 import {
   Box,
   Button,
