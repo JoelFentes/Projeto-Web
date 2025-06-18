@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Projeto Next.js API com Clean Architecture
 
-## Getting Started
+Este projeto é uma API construída com Next.js (app router) que utiliza uma arquitetura limpa, separando claramente as responsabilidades entre Rotas, UseCases e Repositories.
 
-First, run the development server:
+---
 
+## 📚 Estrutura do Projeto
+
+- **Rotas (`/app/api/.../route.ts`)**  
+  Arquivos que expõem as APIs HTTP, recebem as requisições, fazem a autenticação básica, chamam os casos de uso e retornam as respostas HTTP.  
+  Aqui funciona como a camada de Controller na arquitetura tradicional, mas simplificada pelo Next.js.
+
+- **UseCases (`/src/usecases/`)**  
+  Contém a lógica principal da aplicação — regras de negócio, validações, criação de dados, autenticação, etc.  
+  Cada função aqui representa um caso de uso específico do sistema.
+
+- **Repositories (`/src/repositories/`)**  
+  Responsáveis por acessar a base de dados via Prisma ORM.  
+  Contém funções para criar, buscar, atualizar e deletar dados diretamente no banco.
+
+---
+
+## 🔧 Tecnologias Utilizadas
+
+- [Next.js](https://nextjs.org/) (API Routes com app router)  
+- [Prisma ORM](https://www.prisma.io/) para acesso ao banco de dados  
+- [JWT](https://jwt.io/) para autenticação via token  
+- Typescript para tipagem estática  
+
+---
+
+## 🚀 Como rodar o projeto
+
+1. Clone o repositório  
+2. Instale as dependências:  
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+npm install
