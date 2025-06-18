@@ -1,12 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import {
+    Box,
+    TextField,
+    Button,
+    Avatar,
+    Typography,
+    CircularProgress,
+} from '@mui/material';
 
 interface PortfolioData {
-    name: string;
-    bio: string;
-    email: string;
-    profilePicture?: string; // base64 ou url da imagem
+    name: string;             // user.name
+    bio: string;              // portfolio.bio
+    email: string;            // portfolio.email
+    profilePicture?: string;  // user.profilePicture (base64 ou url)
     github?: string;
     linkedin?: string;
     website?: string;
@@ -27,48 +35,58 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
-    // Buscar dados atuais do portfolio na API (GET /api/portfolio) -- supondo que retorna { portfolios: [...] }
     useEffect(() => {
-        async function fetchProfile() {
+        async function fetchData() {
             try {
-                const res = await fetch('/api/portfolio');
-                const json = await res.json();
-                // Pega o primeiro portfolio do usuário por exemplo
-                const portfolio = json.portfolios?.[0];
-                if (portfolio) {
-                    setData({
-                        name: portfolio.name || '',
-                        bio: portfolio.bio || '',
-                        email: portfolio.email || '',
-                        profilePicture: portfolio.projectImage || '', // supondo que projectImage é a foto
-                        github: portfolio.github || '',
-                        linkedin: portfolio.linkedin || '',
-                        website: portfolio.website || '',
-                    });
-                    setPreview(portfolio.projectImage || null);
-                }
+                const userRes = await fetch('/api/user/profile');
+                if (!userRes.ok) throw new Error('Erro ao buscar usuário');
+                const userJson = await userRes.json();
+
+                const portfolioRes = await fetch('/api/portfolio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: data.name,
+                        bio: data.bio,
+                        email: data.email,
+                        github: data.github,
+                        linkedin: data.linkedin,
+                        website: data.website,
+                    }),
+                });
+                const portfolioJson = await portfolioRes.json();
+                const portfolio = portfolioJson.portfolios?.[0];
+
+                setData({
+                    name: userJson.user?.name || '',
+                    bio: portfolio?.bio || '',
+                    email: userJson.user?.email || '',
+                    profilePicture: userJson.user?.profilePicture || '',
+                    github: portfolio?.github || '',
+                    linkedin: portfolio?.linkedin || '',
+                    website: portfolio?.website || '',
+                });
+
+                setPreview(userJson.user?.profilePicture || null);
             } catch (error) {
-                console.error('Erro ao buscar portfolio', error);
+                console.error('Erro ao buscar dados', error);
             }
         }
-        fetchProfile();
+        fetchData();
     }, []);
 
-    // Atualiza campo no state
+
     function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         setData({ ...data, [e.target.name]: e.target.value });
     }
 
-    // Upload de imagem e preview
     function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Preview com URL
         const objectUrl = URL.createObjectURL(file);
         setPreview(objectUrl);
 
-        // Converter para base64 para enviar ao backend (simples, mas para arquivos maiores usar upload direto)
         const reader = new FileReader();
         reader.onloadend = () => {
             setData({ ...data, profilePicture: reader.result as string });
@@ -76,145 +94,172 @@ export default function ProfilePage() {
         reader.readAsDataURL(file);
     }
 
-    // Submeter form
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
         setLoading(true);
         setMessage('');
 
         try {
-            const res = await fetch('/api/portfolio', {
+            // Atualiza o profilePicture e name no User
+            const userRes = await fetch('/api/user/profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    profilePicture: data.profilePicture,
                     name: data.name,
+                }),
+            });
+            if (!userRes.ok) {
+                const err = await userRes.json();
+                throw new Error(err.error || 'Erro ao atualizar perfil do usuário');
+            }
+
+            // Atualiza os dados do portfolio
+            const portfolioRes = await fetch('/api/portfolio', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     bio: data.bio,
                     email: data.email,
-                    projectImage: data.profilePicture, // enviar a base64 da imagem como projectImage
                     github: data.github,
                     linkedin: data.linkedin,
                     website: data.website,
                 }),
             });
-            const json = await res.json();
-            if (res.ok) {
-                setMessage('Perfil atualizado com sucesso!');
-            } else {
-                setMessage(json.error || 'Erro ao atualizar perfil');
+
+            if (!portfolioRes.ok) {
+                const err = await portfolioRes.json();
+                throw new Error(err.error || 'Erro ao atualizar portfólio');
             }
+
+            setMessage('Perfil atualizado com sucesso!');
         } catch (error) {
-            setMessage('Erro na requisição');
+            setMessage((error as Error).message || 'Erro na requisição');
             console.error(error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     return (
-        <main style={{ maxWidth: 600, margin: '2rem auto', padding: '0 1rem' }}>
-            <h1>Editar Perfil</h1>
+        <Box
+            maxWidth={600}
+            mx="auto"
+            mt={4}
+            px={2}
+            component="main"
+            display="flex"
+            flexDirection="column"
+            gap={3}
+        >
+            <Typography variant="h4" fontWeight="bold" textAlign="center">
+                Editar Perfil
+            </Typography>
 
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: 16 }}>
-                    <label>
-                        Nome:<br />
-                        <input
-                            name="name"
-                            value={data.name}
-                            onChange={handleChange}
-                            required
-                            style={{ width: '100%', padding: 8 }}
-                        />
-                    </label>
-                </div>
+            <Box
+                component="form"
+                onSubmit={handleSubmit}
+                display="flex"
+                flexDirection="column"
+                gap={2}
+            >
+                <Box display="flex" justifyContent="center" mb={2}>
+                    <Avatar
+                        src={preview || undefined}
+                        alt="Foto do Perfil"
+                        sx={{ width: 120, height: 120 }}
+                    />
+                </Box>
 
-                <div style={{ marginBottom: 16 }}>
-                    <label>
-                        Bio:<br />
-                        <textarea
-                            name="bio"
-                            value={data.bio}
-                            onChange={handleChange}
-                            required
-                            rows={4}
-                            style={{ width: '100%', padding: 8 }}
-                        />
-                    </label>
-                </div>
+                <Button variant="contained" component="label" sx={{ mb: 2, width: 'fit-content', mx: 'auto' }}>
+                    Alterar Foto
+                    <input
+                        hidden
+                        accept="image/*"
+                        type="file"
+                        onChange={handleFileChange}
+                    />
+                </Button>
 
-                <div style={{ marginBottom: 16 }}>
-                    <label>
-                        E-mail:<br />
-                        <input
-                            name="email"
-                            type="email"
-                            value={data.email}
-                            onChange={handleChange}
-                            required
-                            style={{ width: '100%', padding: 8 }}
-                        />
-                    </label>
-                </div>
+                <TextField
+                    label="Nome"
+                    name="name"
+                    value={data.name}
+                    onChange={handleChange}
+                    fullWidth
+                    focused
+                />
 
-                <div style={{ marginBottom: 16 }}>
-                    <label>
-                        GitHub:<br />
-                        <input
-                            name="github"
-                            value={data.github}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: 8 }}
-                        />
-                    </label>
-                </div>
+                <TextField
+                    label="Bio"
+                    name="bio"
+                    value={data.bio}
+                    onChange={handleChange}
+                    multiline
+                    rows={4}
+                    fullWidth
+                    focused
+                />
 
-                <div style={{ marginBottom: 16 }}>
-                    <label>
-                        LinkedIn:<br />
-                        <input
-                            name="linkedin"
-                            value={data.linkedin}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: 8 }}
-                        />
-                    </label>
-                </div>
+                <TextField
+                    label="E-mail"
+                    name="email"
+                    type="email"
+                    value={data.email}
+                    onChange={handleChange}
+                    fullWidth
+                    focused
+                />
 
-                <div style={{ marginBottom: 16 }}>
-                    <label>
-                        Website:<br />
-                        <input
-                            name="website"
-                            value={data.website}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: 8 }}
-                        />
-                    </label>
-                </div>
+                <TextField
+                    label="GitHub"
+                    name="github"
+                    value={data.github}
+                    onChange={handleChange}
+                    fullWidth
+                    focused
+                />
 
-                <div style={{ marginBottom: 16 }}>
-                    <label>
-                        Foto do Perfil:<br />
-                        {preview && (
-                            <img
-                                src={preview}
-                                alt="Preview profile"
-                                style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: '50%', marginBottom: 8 }}
-                            />
-                        )}
-                        <input type="file" accept="image/*" onChange={handleFileChange} />
-                    </label>
-                </div>
+                <TextField
+                    label="LinkedIn"
+                    name="linkedin"
+                    value={data.linkedin}
+                    onChange={handleChange}
+                    fullWidth
+                    focused
+                />
 
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Salvando...' : 'Salvar Perfil'}
-                </button>
-            </form>
+                <TextField
+                    label="Website"
+                    name="website"
+                    value={data.website}
+                    onChange={handleChange}
+                    fullWidth
+                    focused
+                />
+
+                <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    disabled={loading}
+                    sx={{ mt: 2 }}
+                >
+                    {loading ? <CircularProgress size={24} color="inherit" /> : 'Salvar Perfil'}
+                </Button>
+            </Box>
 
             {message && (
-                <p style={{ marginTop: 16, color: message.includes('sucesso') ? 'green' : 'red' }}>
+                <Typography
+                    mb={2}
+                    color={message.includes('sucesso') ? 'success.main' : 'error.main'}
+                    textAlign="center"
+                    mt={2}
+                    fontWeight="medium"
+                >
                     {message}
-                </p>
+                </Typography>
             )}
-        </main>
+        </Box>
     );
 }

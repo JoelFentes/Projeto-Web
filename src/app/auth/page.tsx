@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/app/context/AuthContext'; 
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -19,7 +19,6 @@ export default function AuthPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,17 +118,7 @@ export default function AuthPage() {
           value={password}
           onChange={(e: any) => setPassword(e.target.value)}
         />
-        {isSignup && (
-          <CustomTextField
-            id="confirmPassword"
-            label="Confirmar Senha"
-            type="password"
-            required
-            fullWidth
-            value={confirmPassword}
-            onChange={(e: any) => setConfirmPassword(e.target.value)}
-          />
-        )}
+
 
         <Link
           component="button"

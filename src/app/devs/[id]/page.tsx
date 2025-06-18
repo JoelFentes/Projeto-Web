@@ -38,6 +38,10 @@ interface Portfolio {
     projectLikes?: number;
     projectViews?: number;
     projectImage?: string;
+    user?: {
+        name?: string;
+        profilePicture?: string;
+    };
 }
 
 export default function DevDetailsPage() {
@@ -52,6 +56,9 @@ export default function DevDetailsPage() {
     const [isFollowing, setIsFollowing] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [projectLikes, setProjectLikes] = useState(0);
+    const [followers, setFollowers] = useState(0);
+    const [following, setFollowing] = useState(0);
+    const [likes, setLikes] = useState(0);
 
     useEffect(() => {
         if (!id) return;
@@ -65,6 +72,9 @@ export default function DevDetailsPage() {
                 const data = await res.json();
                 setPortfolio(data.portfolio);
                 setProjectLikes(data.portfolio.projectLikes ?? 0);
+                setFollowers(data.portfolio.followers ?? 0);
+                setFollowing(data.portfolio.following ?? 0);
+                setLikes(data.portfolio.likes ?? 0);
             } catch (err) {
                 setError((err as Error).message);
             } finally {
@@ -77,11 +87,13 @@ export default function DevDetailsPage() {
 
     const handleFollow = () => {
         setIsFollowing((prev) => !prev);
+        setFollowers((prev) => isFollowing ? prev - 1 : prev + 1);
     };
 
     const handleLikeProject = () => {
         setIsLiked((prev) => !prev);
         setProjectLikes((prev) => isLiked ? prev - 1 : prev + 1);
+        setLikes((prev) => isLiked ? prev - 1 : prev + 1);
     };
 
     if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 10 }} />;
@@ -91,7 +103,7 @@ export default function DevDetailsPage() {
     const backgroundImageUrl =
         portfolio.projectImage && portfolio.projectImage.trim() !== ''
             ? portfolio.projectImage
-            : 'https://source.unsplash.com/1600x600/?technology,programming';
+            : 'https://cdn.dribbble.com/userupload/19072029/file/original-964d527aa2947ce15e717e7bb2f9a749.png?resize=752x&vertical=center';
 
     return (
         <Box
@@ -104,15 +116,17 @@ export default function DevDetailsPage() {
         >
             <Box sx={{ width: '100%', height: 125, bgcolor: 'text.secondary', boxShadow: 3 }} />
 
-            {/* Foto de Perfil */}
             <Box
+                component="img"
+                src={portfolio.user?.profilePicture || '/default-avatar.png'}
+                alt={`Foto de ${portfolio.name}`}
                 sx={{
                     position: 'absolute',
                     left: '5%',
                     top: 120,
                     width: 210,
                     height: 210,
-                    overflow: 'hidden',
+                    objectFit: 'cover',
                     borderRadius: 10,
                     mt: -6,
                     boxShadow: 3,
@@ -124,7 +138,7 @@ export default function DevDetailsPage() {
                 {/* Nome + Stacks */}
                 <Box mt={4} width="100%" maxWidth={800} position={'absolute'} left="23%">
                     <Typography variant="h4" fontWeight="bold" gutterBottom>
-                        {portfolio.name}
+                        {portfolio.user?.name || portfolio.name}
                     </Typography>
 
                     <Stack direction="row" spacing={1} flexWrap="wrap">
@@ -203,7 +217,6 @@ export default function DevDetailsPage() {
                                         <Typography variant="body2">
                                             {projectLikes}
                                         </Typography>
-
                                     </Stack>
                                 </Box>
 
@@ -218,9 +231,9 @@ export default function DevDetailsPage() {
                 {/* Likes Tab */}
                 {tabIndex === 1 && (
                     <Box sx={{ mt: 3, px: 2 }}>
-                        <Typography variant="h6" mb={2}>Followers: {portfolio.followers ?? 0}</Typography>
-                        <Typography variant="h6" mb={2}>Following: {portfolio.following ?? 0}</Typography>
-                        <Typography variant="h6" mb={2}>Likes: {portfolio.likes ?? 0}</Typography>
+                        <Typography variant="h6" mb={2}>Followers: {followers}</Typography>
+                        <Typography variant="h6" mb={2}>Following: {following}</Typography>
+                        <Typography variant="h6" mb={2}>Likes: {likes}</Typography>
                     </Box>
                 )}
 

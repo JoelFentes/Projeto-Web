@@ -166,7 +166,7 @@ export default function CreatePortfolio() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // garante envio do cookie
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 

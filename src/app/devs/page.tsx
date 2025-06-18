@@ -180,12 +180,12 @@ export default function DevsPage() {
                 container
                 spacing={1}
                 sx={{
-                    flexGrow: 1, // para ocupar espaço vertical restante
+                    flexGrow: 1,
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',  // 2 colunas
-                    gridTemplateRows: 'repeat(2, 1fr)',     // 2 linhas
-                    gap: 2, // gap de 8px (2 * 4px padrão do MUI)
-                    overflow: 'auto',  // caso o conteúdo extrapole o card
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gridTemplateRows: 'repeat(2, 1fr)',
+                    gap: 2,
+                    overflow: 'auto',
                 }}
             >
                 {paginatedPortfolios.length === 0 ? (
@@ -207,12 +207,8 @@ export default function DevsPage() {
                                 justifyContent: 'space-between',
                                 height: '100%',
                                 overflow: 'hidden',
-                                cursor: 'pointer', // Indica que é clicável
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                    boxShadow: 6,
-                                    transform: 'translateY(-4px)',
-                                },
+                                cursor: 'pointer',
+
                             }}
                         >
                             <Box>
@@ -295,12 +291,12 @@ export default function DevsPage() {
                                 sx={{ display: 'flex', justifyContent: 'space-around', pt: 2, borderTop: '1px solid', borderColor: 'divider' }}
                             >
                                 {portfolio.github && (
-                                    <MuiLink href={"https://www.github.com/" + portfolio.github} target="_blank" sx={{ fontSize: 13, fontWeight: 'medium' }}>
+                                    <MuiLink href={portfolio.github} target="_blank" sx={{ fontSize: 13, fontWeight: 'medium' }}>
                                         GitHub
                                     </MuiLink>
                                 )}
                                 {portfolio.linkedin && (
-                                    <MuiLink href={"https://www.linkedin.com/in/" + portfolio.linkedin} target="_blank" sx={{ fontSize: 13, fontWeight: 'medium' }}>
+                                    <MuiLink href={portfolio.linkedin} target="_blank" sx={{ fontSize: 13, fontWeight: 'medium' }}>
                                         LinkedIn
                                     </MuiLink>
                                 )}
@@ -316,7 +312,6 @@ export default function DevsPage() {
                 )}
             </Grid>
 
-            {/* Paginação usando componente oficial MUI */}
             {totalPages > 1 && (
                 <Box mt={3} display="flex" justifyContent="center">
                     <Pagination

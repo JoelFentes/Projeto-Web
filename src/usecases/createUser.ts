@@ -14,7 +14,7 @@ export async function createUserUseCase(name: string, email: string, password: s
   }
 
   const hashed = await hashPassword(password);
-const user = await userRepository.create({ email, name, password: hashed });
+  const user = await userRepository.create({ email, name, password: hashed });
   const token = generateToken({ email: user.email });
 
   return {

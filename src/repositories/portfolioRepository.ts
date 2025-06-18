@@ -64,11 +64,14 @@ export class PortfolioRepository {
     return prisma.portfolio.findMany();
   }
 
-   async getById(id: string) {
-    return prisma.portfolio.findUnique({
-      where: { id },
-    });
-  }
+  async getById(id: string) {
+  return prisma.portfolio.findUnique({
+  where: { id },
+  include: { user: true }, 
+});
+
+}
+
 
 }
 

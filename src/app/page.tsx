@@ -1,6 +1,8 @@
 'use client';
 
-import { Box, Typography, Button, Divider, Avatar } from '@mui/material';
+import {
+  Box, Typography, Button, Divider, Avatar, Link as MuiLink,
+} from '@mui/material';
 import { Person } from '@mui/icons-material';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
@@ -205,6 +207,11 @@ export default function HomePage() {
             ))}
           </Box>
         </Box>
+
+        <MuiLink sx={{
+          display: 'flex', justifyContent: 'center', color: 'text.primary', fontStyle: '', fontWeight: 'bold', mb: 4, cursor: 'pointer'
+        }} component={Link} href="/devs" variant="h6" onClick={() => {
+        }} >Ver todos</MuiLink>
 
 
         {/* Quarta seção: Footer */}

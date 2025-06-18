@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Avatar, Chip, Divider } from '@mui/material';
+import { Box, Typography, Chip, Divider } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -10,6 +10,9 @@ interface Portfolio {
     stacks: string[];
     techList: string[];
     projectImage: string;
+    user?: {
+        name?: string;
+    };
 }
 
 export default function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
@@ -52,20 +55,20 @@ export default function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
             {/* Conteúdo */}
             <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Typography variant="h6" fontWeight="bold" color="text.primary">
-                    Dev: {portfolio.name}
+                    Dev: {portfolio.user?.name || portfolio.name}
                 </Typography>
 
-                <Divider></Divider>
+                <Divider />
 
                 {/* Stacks */}
                 <Typography variant="h6" color="text.primary" fontSize={14}>
                     Stacks:
                 </Typography>
-                <Typography variant="body2" color="primary.main" fontSize={12} >
+                <Typography variant="body2" color="primary.main" fontSize={12}>
                     {portfolio.stacks.join(', ')}
                 </Typography>
 
-                <Divider></Divider>
+                <Divider />
 
                 {/* Tech list */}
                 <Typography variant="h6" color="text.primary" fontSize={14}>
