@@ -1,4 +1,4 @@
-# Projeto Next.js API com Clean Architecture
+# Projeto Next.js API 
 
 Este projeto é uma API construída com Next.js (app router) que utiliza uma arquitetura limpa, separando claramente as responsabilidades entre Rotas, UseCases e Repositories.
 
