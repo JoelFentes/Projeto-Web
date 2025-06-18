@@ -4,7 +4,7 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#618985', // hookers-green
+      main: '#414535', // hookers-green
     },
     secondary: {
       main: '#c19875', // lion

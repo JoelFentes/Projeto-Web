@@ -15,8 +15,8 @@ interface Portfolio {
   id: string;
   bio: string;
   name: string;
-  stacks: string;
-  techList: string;
+  stacks: string[];
+  techList: string[];
   projectImage: string;
 }
 
@@ -200,7 +200,7 @@ export default function HomePage() {
               mt: 4,
             }}
           >
-            {portfolios.map((portfolio) => (
+            {portfolios.slice(0, 3).map((portfolio) => (
               <PortfolioCard key={portfolio.id} portfolio={portfolio} />
             ))}
           </Box>

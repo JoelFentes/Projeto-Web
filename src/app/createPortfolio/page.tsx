@@ -22,6 +22,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckIcon from '@mui/icons-material/Check';
 import { useState } from "react";
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { stringify } from "querystring";
 import CustomTextField from "@/components/CustomTextFieldPortfolio";
 import theme from "@/theme";
@@ -56,6 +59,11 @@ const steps = [
 ];
 
 export default function CreatePortfolio() {
+  const { user } = useAuth();
+  const router = useRouter();
+
+
+
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -75,6 +83,17 @@ export default function CreatePortfolio() {
     projectImage: ''
   });
 
+  useEffect(() => {
+    if (!user) {
+      router.push('/auth');
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return <p>Redirecionando para login...</p>;
+  }
+
+
   const handleChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -83,15 +102,22 @@ export default function CreatePortfolio() {
     }));
   };
 
+  function capitalizeFirstLetter(str: string) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   const handleAddStack = () => {
-    if (formData.stack.trim()) {
+    const trimmed = formData.stack.trim();
+    if (trimmed) {
       setFormData(prev => ({
         ...prev,
-        stacks: [...prev.stacks, prev.stack.trim()],
+        stacks: [...prev.stacks, capitalizeFirstLetter(trimmed)],
         stack: ''
       }));
     }
   };
+
 
   const handleRemoveStack = (index: number) => {
     setFormData(prev => ({
@@ -101,10 +127,11 @@ export default function CreatePortfolio() {
   };
 
   const handleAddTech = () => {
-    if (formData.technologies.trim()) {
+    const trimmed = formData.technologies.trim();
+    if (trimmed) {
       setFormData(prev => ({
         ...prev,
-        techList: [...prev.techList, prev.technologies.trim()],
+        techList: [...prev.techList, capitalizeFirstLetter(trimmed)],
         technologies: ''
       }));
     }

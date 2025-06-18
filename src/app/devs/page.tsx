@@ -10,8 +10,15 @@ import {
     Grid,
     TextField,
     MenuItem,
+    Pagination,
+    Button,
 } from '@mui/material';
 import Image from 'next/image';
+import LayersIcon from '@mui/icons-material/Layers';
+import CodeIcon from '@mui/icons-material/Code';
+import theme from '@/theme';
+import { useRouter } from 'next/navigation';
+
 
 interface Portfolio {
     id: string;
@@ -37,6 +44,12 @@ export default function DevsPage() {
     const [searchName, setSearchName] = useState('');
     const [selectedStack, setSelectedStack] = useState('');
     const [selectedTech, setSelectedTech] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const portfoliosPerPage = 4;
+
+    const router = useRouter();
+
 
     useEffect(() => {
         const fetchPortfolios = async () => {
@@ -75,6 +88,12 @@ export default function DevsPage() {
         });
     }, [portfolios, searchName, selectedStack, selectedTech]);
 
+    const totalPages = Math.ceil(filteredPortfolios.length / portfoliosPerPage);
+    const paginatedPortfolios = filteredPortfolios.slice(
+        (currentPage - 1) * portfoliosPerPage,
+        currentPage * portfoliosPerPage
+    );
+
     if (loading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
@@ -93,19 +112,225 @@ export default function DevsPage() {
 
     return (
         <Box sx={{
-            height: '100vh',
-            maxHeight: '100%',
+            height: '100%',
             width: '100%',
             mx: 'auto',
             p: 6,
-            bgcolor: 'text.primary',
+            bgcolor: 'text.secondary',
         }}>
-            <Typography variant="h4" color='text.secondary' fontWeight="bold" mb={4} textAlign="start">
-                Descubra os Devs atráves dos seus portfólios
+            <Typography variant="h4" color='text.primary' fontWeight="bold" mb={4} textAlign="start">
+                Descubra os Devs através dos seus portfólios
             </Typography>
 
             {/* Filtros */}
+            <Box mb={4} display="flex" gap={2} >
+                <TextField
+                    label="Buscar por Nome"
+                    value={searchName}
+                    onChange={(e) => {
+                        setSearchName(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                    variant="outlined"
+                    focused
+                    color="primary"
+                />
 
+                <TextField
+                    sx={{ minWidth: 200, }}
+                    select
+                    label="Filtrar por Stack"
+                    value={selectedStack}
+                    onChange={(e) => {
+                        setSelectedStack(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                    variant="outlined"
+                    focused
+                    color="primary"
+                >
+                    <MenuItem value="">Todas</MenuItem>
+                    {allStacks.map((stack) => (
+                        <MenuItem key={stack} value={stack}>{stack}</MenuItem>
+                    ))}
+                </TextField>
+
+                <TextField
+                    sx={{ minWidth: 200 }}
+                    select
+                    label="Filtrar por Tech"
+                    value={selectedTech}
+                    onChange={(e) => {
+                        setSelectedTech(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                    variant="outlined"
+                    focused
+                    color="primary"
+                >
+                    <MenuItem value="">Todas</MenuItem>
+                    {allTechs.map((tech) => (
+                        <MenuItem key={tech} value={tech}>{tech}</MenuItem>
+                    ))}
+                </TextField>
+            </Box>
+
+            {/* Lista de Portfolios */}
+            <Grid
+                container
+                spacing={1}
+                sx={{
+                    flexGrow: 1, // para ocupar espaço vertical restante
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',  // 2 colunas
+                    gridTemplateRows: 'repeat(2, 1fr)',     // 2 linhas
+                    gap: 2, // gap de 8px (2 * 4px padrão do MUI)
+                    overflow: 'auto',  // caso o conteúdo extrapole o card
+                }}
+            >
+                {paginatedPortfolios.length === 0 ? (
+                    <Typography color="text.secondary">Nenhum portfolio encontrado.</Typography>
+                ) : (
+                    paginatedPortfolios.map((portfolio) => (
+                        <Box
+                            key={portfolio.id}
+                            onClick={() => router.push(`/devs/${portfolio.id}`)}
+                            sx={{
+                                p: 3,
+                                color: 'text.primary',
+                                borderRadius: 3,
+                                borderColor: 'primary.main',
+                                borderWidth: 1,
+                                boxShadow: 3,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                height: '100%',
+                                overflow: 'hidden',
+                                cursor: 'pointer', // Indica que é clicável
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                    boxShadow: 6,
+                                    transform: 'translateY(-4px)',
+                                },
+                            }}
+                        >
+                            <Box>
+                                <Typography variant="h5" fontWeight="bold" gutterBottom noWrap>
+                                    {portfolio.name}
+                                </Typography>
+                                <Typography
+                                    variant="body2"
+                                    mb={2}
+                                    sx={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'normal',
+                                    }}
+                                >
+                                    {portfolio.bio}
+                                </Typography>
+
+                                {/* Stacks */}
+                                <Box mb={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                                    {portfolio.stacks.map((stack, index) => (
+                                        <Chip
+                                            key={index}
+                                            label={stack}
+                                            size="medium"
+                                            icon={<LayersIcon sx={{ fontSize: 24, color: theme.palette.text.secondary }} />}
+                                            sx={{
+                                                fontWeight: '400',
+                                                backgroundColor: theme.palette.primary.main,
+                                                color: theme.palette.text.secondary,
+                                            }}
+                                        />
+                                    ))}
+                                </Box>
+
+                                {/* Tecnologias */}
+                                <Box mb={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                    {portfolio.techList.map((tech, index) => (
+                                        <Chip
+                                            key={index}
+                                            label={tech}
+                                            size="medium"
+                                            icon={<CodeIcon sx={{ fontSize: 24, color: theme.palette.text.secondary }} />}
+                                            sx={{
+                                                fontWeight: '400',
+                                                backgroundColor: theme.palette.primary.main,
+                                                color: theme.palette.text.secondary,
+                                            }}
+                                        />
+                                    ))}
+                                </Box>
+
+
+                                {/* Projeto */}
+                                {portfolio.projectTitle && (
+                                    <Box mb={2}>
+                                        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                                            {portfolio.projectTitle}
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                maxHeight: 50,
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'normal',
+                                            }}
+                                            mb={1}
+                                        >
+                                            {portfolio.projectDescription}
+                                        </Typography>
+
+                                    </Box>
+                                )}
+                            </Box>
+
+                            {/* Contatos */}
+                            <Box
+                                mt="auto"
+                                sx={{ display: 'flex', justifyContent: 'space-around', pt: 2, borderTop: '1px solid', borderColor: 'divider' }}
+                            >
+                                {portfolio.github && (
+                                    <MuiLink href={"https://www.github.com/" + portfolio.github} target="_blank" sx={{ fontSize: 13, fontWeight: 'medium' }}>
+                                        GitHub
+                                    </MuiLink>
+                                )}
+                                {portfolio.linkedin && (
+                                    <MuiLink href={"https://www.linkedin.com/in/" + portfolio.linkedin} target="_blank" sx={{ fontSize: 13, fontWeight: 'medium' }}>
+                                        LinkedIn
+                                    </MuiLink>
+                                )}
+                                {portfolio.website && (
+                                    <MuiLink href={portfolio.website} target="_blank" sx={{ fontSize: 13, fontWeight: 'medium' }}>
+                                        Website
+                                    </MuiLink>
+                                )}
+                            </Box>
+                        </Box>
+
+                    ))
+                )}
+            </Grid>
+
+            {/* Paginação usando componente oficial MUI */}
+            {totalPages > 1 && (
+                <Box mt={3} display="flex" justifyContent="center">
+                    <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={(_, page) => setCurrentPage(page)}
+                        color="primary"
+                        size="large"
+                        showFirstButton
+                        showLastButton
+                    />
+                </Box>
+            )}
         </Box>
+
     );
 }

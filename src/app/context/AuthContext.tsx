@@ -42,10 +42,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser();
   }, []);
 
-  function logout() {
+  async function logout() {
     setUser(null);
-    fetch('/api/auth/logout', { method: 'POST' });
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('Erro ao deslogar:', e);
+    }
   }
+
+
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout }}>
